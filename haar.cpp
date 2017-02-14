@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <memory>
 #include <math.h>
+#include "lodepng/lodepng.h"
 
 #define POWER_OF_2(n) (((n) & ((n) - 1)) == 0 && (n) != 0)
 
@@ -158,10 +159,79 @@ bool ihaarTransform2D(std::vector<std::vector<short>>& data) {
         if (!ihaarTransform(data[i])) return false;
 
     return true;
+}
 
+std::unique_ptr<std::vector<short>> encodeImage(unsigned int numChannels,
+                                                unsigned int dim,
+                                                unsigned char* data) {
+    
+    // ensure the image dimension is a power of two
+    if (! POWER_OF_2(dim))
+        return NULL;
+    
+    std::vector<std::vector<std::vector<short>>> channels(numChannels);
+
+    // copy that data from the image format into a matrix for each
+    // channel
+    for (unsigned int i = 0; i < dim; i++) {
+        std::vector<std::vector<short>> rowChannels(numChannels);
+        for (unsigned int j = 0; j < dim; j++) {
+            for (unsigned int c = 0; c < numChannels; c++) {
+                unsigned int idx = (i + (j * dim)) * numChannels + c;
+                rowChannels[c].push_back((short)data[idx]);
+            }
+        }
+
+        for (unsigned int c = 0; c < numChannels; c++) {
+            channels[c].push_back(rowChannels[c]);
+        }
+    }
+
+    // encode each channel
+    for (auto channel : channels)
+        haarTransform2D(channel);
+
+    std::unique_ptr<std::vector<short>> toR(new std::vector<short>());
+
+    toR->push_back((short)numChannels);
+    toR->push_back((short)dim);
+    for (auto channel : channels)
+        for (auto row : channel)
+            for (auto val : row) {
+                printf("%d\n", val);
+                toR->push_back(val);
+            }
+
+    return toR;
+}
+
+std::unique_ptr<std::vector<unsigned char>> decodeImage(std::unique_ptr<std::vector<short>> encoded) {
+    int channels = encoded[0];
+    int dim = encoded[1];
+
+    std::vector<unsigned char> imgData;
+
+    
 }
 
 int main(int argc, char** argv) {
+    std::vector<unsigned char> image; //the raw pixels
+    unsigned int width, height;
+    
+    //decode
+    unsigned int error = lodepng::decode(image, width, height, "ff.png");
+
+    //if there's an error, display it
+    if(error) printf("decoder error: %s\n", lodepng_error_text(error));
+    
+    printf("Image is %d by %d (vector length: %ld)\n", width, height, image.size());
+
+    std::unique_ptr<std::vector<short>> encoded = encodeImage(4, width, &image[0]);
+    
+}
+
+
+/*
     std::vector<short> r1 = {88, 88, 89, 90, 92, 94, 96, 97};
     std::vector<short> r2 = {90, 90, 91, 92, 93, 95, 97, 97};
     std::vector<short> r3 = {92, 92, 93, 94, 95, 96, 97, 97};
@@ -196,7 +266,7 @@ int main(int argc, char** argv) {
             printf("%d ", s);
         printf("\n");
     }
-
+*/
     /*
 91 -6 -1 -3 0 -1 -2 -1 
 92 -5 -1 -3 0 -1 -2 0 
@@ -227,5 +297,3 @@ int main(int argc, char** argv) {
     */
 
             
-
-}
