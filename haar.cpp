@@ -16,11 +16,11 @@
 // You should have received a copy of the GNU General Public License
 // along with haar-compression.  If not, see <http://www.gnu.org/licenses/>.
 // 
-// < end copyright > 
-#include <vector>
+// < end copyright >
+#include "haar.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <memory>
+
 #include <math.h>
 #include "lodepng/lodepng.h"
 
@@ -161,7 +161,7 @@ bool ihaarTransform2D(std::vector<std::vector<short>>& data) {
     return true;
 }
 
-std::shared_ptr<std::vector<short>> encodeImage(unsigned int numChannels,
+std::unique_ptr<std::vector<short>> encodeImage(unsigned int numChannels,
                                                 unsigned int dim,
                                                 unsigned char* data) {
     
@@ -177,7 +177,7 @@ std::shared_ptr<std::vector<short>> encodeImage(unsigned int numChannels,
         std::vector<std::vector<short>> rowChannels(numChannels);
         for (unsigned int j = 0; j < dim; j++) {
             for (unsigned int c = 0; c < numChannels; c++) {
-                unsigned int idx = (i + (j * dim)) * numChannels + c;
+                unsigned int idx = (j + (i * dim)) * numChannels + c;
                 rowChannels[c].push_back((short)data[idx]);
             }
         }
@@ -191,7 +191,7 @@ std::shared_ptr<std::vector<short>> encodeImage(unsigned int numChannels,
     for (auto channel : channels)
         haarTransform2D(channel);
 
-    std::shared_ptr<std::vector<short>> toR(new std::vector<short>());
+    std::unique_ptr<std::vector<short>> toR(new std::vector<short>());
 
     toR->push_back((short)numChannels);
     toR->push_back((short)dim);
@@ -204,7 +204,7 @@ std::shared_ptr<std::vector<short>> encodeImage(unsigned int numChannels,
     return toR;
 }
 
-std::shared_ptr<std::vector<unsigned char>> decodeImage(std::shared_ptr<std::vector<short>> encoded) {
+std::unique_ptr<std::vector<unsigned char>> decodeImage(std::unique_ptr<std::vector<short>> encoded) {
     std::vector<short> enc = *(encoded.get());
 
     int numChannels = enc[0];
@@ -213,13 +213,17 @@ std::shared_ptr<std::vector<unsigned char>> decodeImage(std::shared_ptr<std::vec
     std::vector<std::vector<std::vector<short>>> channels(numChannels);
     
     for (int c = 0; c < numChannels; c++) {
-        std::vector<std::vector<short>> channel(dim);
+        std::vector<std::vector<short>> channel(
+            dim, // number of entries
+            std::vector<short>(dim) // default entry
+            );
+        
         for (int j = 0; j < dim*dim; j++) {
             int idx = j + (c*dim*dim) + 2;
             
             int row = j / dim;
             int col = j % dim;
-            
+
             channel[row][col] = enc[idx];
         }
         channels[c] = channel;
@@ -229,10 +233,12 @@ std::shared_ptr<std::vector<unsigned char>> decodeImage(std::shared_ptr<std::vec
         ihaarTransform2D(channel);
 
     // recombine the three channels into image data
-    std::shared_ptr<std::vector<unsigned char>> toR(new std::vector<unsigned char>);
-    for (int i = 0; i < dim; i++) {
-        for (int j = 0; j <  dim; j++) {
-            toR->push_back(channels[i % numChannels][i][j]);
+    std::unique_ptr<std::vector<unsigned char>> toR(new std::vector<unsigned char>);
+    for (int i = 0; i < dim*dim; i++) {
+        int row = i / dim;
+        int col = i % dim;
+        for (int c = 0; c < numChannels; c++) {
+            toR->push_back(channels[c][row][col]);
         }
     }
 
@@ -240,24 +246,20 @@ std::shared_ptr<std::vector<unsigned char>> decodeImage(std::shared_ptr<std::vec
     
 }
 
-int main(int argc, char** argv) {
-    std::vector<unsigned char> image; //the raw pixels
-    unsigned int width, height;
-    
-    //decode
-    unsigned int error = lodepng::decode(image, width, height, "ff.png");
+//int main(int argc, char** argv) {
 
-    //if there's an error, display it
-    if(error) printf("decoder error: %s\n", lodepng_error_text(error));
-    
-    printf("Image is %d by %d (vector length: %ld)\n", width, height, image.size());
+    /*std::vector<unsigned char> image = { 1, 1, 1, 2, 2, 2,
+                                         3, 3, 3, 4, 4, 4 };
+    std::unique_ptr<std::vector<short>> encoded = encodeImage(3, 2, &image[0]);
+    std::unique_ptr<std::vector<unsigned char>> decoded = decodeImage(encoded);
 
+    for (unsigned int i = 0; i < image.size(); i++) {
+        printf("%d %d\n", image[i], decoded->at(i));
+        }*/
+
+  
     
-    std::shared_ptr<std::vector<short>> encoded = encodeImage(4, width, &image[0]);
-    
-    std::shared_ptr<std::vector<unsigned char>> decoded = decodeImage(encoded);
-    
-}
+
 
 
 /*
