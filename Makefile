@@ -1,6 +1,6 @@
 
-haar: haar.o lodepng.o
-	g++ -Wall haar.o lodepng.o -o haar
+haar: haar.o
+	g++ -Wall haar.o -o haar
 
 test_haar: haar.o lodepng.o img_test.o
 	g++ -Wall haar.o lodepng.o img_test.o -o test_haar

@@ -22,7 +22,6 @@
 #include <stdio.h>
 
 #include <math.h>
-#include "lodepng/lodepng.h"
 
 #define POWER_OF_2(n) (((n) & ((n) - 1)) == 0 && (n) != 0)
 
@@ -245,86 +244,5 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(std::unique_ptr<std::vec
     return toR;
     
 }
-
-//int main(int argc, char** argv) {
-
-    /*std::vector<unsigned char> image = { 1, 1, 1, 2, 2, 2,
-                                         3, 3, 3, 4, 4, 4 };
-    std::unique_ptr<std::vector<short>> encoded = encodeImage(3, 2, &image[0]);
-    std::unique_ptr<std::vector<unsigned char>> decoded = decodeImage(encoded);
-
-    for (unsigned int i = 0; i < image.size(); i++) {
-        printf("%d %d\n", image[i], decoded->at(i));
-        }*/
-
-  
-    
-
-
-
-/*
-    std::vector<short> r1 = {88, 88, 89, 90, 92, 94, 96, 97};
-    std::vector<short> r2 = {90, 90, 91, 92, 93, 95, 97, 97};
-    std::vector<short> r3 = {92, 92, 93, 94, 95, 96, 97, 97};
-    std::vector<short> r4 = {93, 93, 94, 95, 96, 96, 96, 96};
-    std::vector<short> r5 = {92, 93, 95, 96, 96, 96, 96, 95};
-    std::vector<short> r6 = {92, 94, 96, 98, 99, 99, 98, 97};
-    std::vector<short> r7 = {94, 96, 99, 101, 103, 103, 102, 101};
-    std::vector<short> r8 = {95, 97, 101, 104, 106, 106, 105, 105};
-
-    std::vector<std::vector<short>> mat = {r1, r2, r3, r4, r5, r6, r7, r8};
-    
-    
-    for (std::vector<short> row : mat) {
-        for (short s : row)
-            printf("%d ", s);
-        printf("\n");
-    }
-
-
-    haarTransform2D(mat);
-    
-    for (std::vector<short> row : mat) {
-        for (short s : row)
-            printf("%d ", s);
-        printf("\n");
-    }
-
-    ihaarTransform2D(mat);
-
-    for (std::vector<short> row : mat) {
-        for (short s : row)
-            printf("%d ", s);
-        printf("\n");
-    }
-*/
-    /*
-91 -6 -1 -3 0 -1 -2 -1 
-92 -5 -1 -3 0 -1 -2 0 
-94 -4 -1 -2 0 -1 -1 0 
-94 -3 -1 0 0 -1 0 0 
-94 -2 -3 1 -1 -1 0 1 
-96 -3 -4 2 -2 -2 0 1 
-99 -5 -5 2 -2 -2 0 1 
-102 -6 -6 1 -2 -3 0 0 
-     */
-    /*
-    
-    std::vector<short> test = {-6, -5, -4, -3, -2, -3, -5, -6};
-
-    for (short s : test)
-        printf("%d ", s);
-    printf("\n");
-
-    haarTransform(test);
-
-
-    ihaarTransform(test);
-
-
-    for (short s : test)
-        printf("%d ", s);
-    printf("\n");
-    */
 
             
