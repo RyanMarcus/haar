@@ -53,20 +53,40 @@ TEST_CASE("correctly reproduces 1D input #1", "[1D]") {
 
 
 TEST_CASE("correctly reproduces 1D input #2", "[1D]") {
-    std::vector<short> r1 = {5, 10, 55, 5};
+    std::vector<short> r1 = {14, 88, 9, 64, 100, 22, 6, 1};
     haarTransform(r1); 
 
-    REQUIRE(r1[0] == 18);
-    REQUIRE(r1[1] == -23);
-    REQUIRE(r1[2] == -5);
-    REQUIRE(r1[3] == 50);
+    REQUIRE(r1[1] != 88);
 
     ihaarTransform(r1);
 
-    REQUIRE(r1[0] == 5);
-    REQUIRE(r1[1] == 10);
-    REQUIRE(r1[2] == 55);
-    REQUIRE(r1[3] == 5);
-
+    REQUIRE(r1[0] == 14);
+    REQUIRE(r1[1] == 88);
+    REQUIRE(r1[2] == 9);
+    REQUIRE(r1[3] == 64);
+    REQUIRE(r1[4] == 100);
+    REQUIRE(r1[5] == 22);
+    REQUIRE(r1[6] == 6);
+    REQUIRE(r1[7] == 1);
 
 }
+
+TEST_CASE("correctly reproduces 1D input #3", "[1D]") {
+    std::vector<short> r1 = {14, 88, 9, 64, 100, 22, 6, 1};
+    haarTransform(r1); 
+
+    REQUIRE(r1[1] != 88);
+
+    ihaarTransform(r1);
+
+    REQUIRE(r1[0] == 14);
+    REQUIRE(r1[1] == 88);
+    REQUIRE(r1[2] == 9);
+    REQUIRE(r1[3] == 64);
+    REQUIRE(r1[4] == 100);
+    REQUIRE(r1[5] == 22);
+    REQUIRE(r1[6] == 6);
+    REQUIRE(r1[7] == 1);
+
+}
+

@@ -20,7 +20,6 @@
 #include "haar.h"
 #include <stdlib.h>
 #include <stdio.h>
-
 #include <math.h>
 
 #define POWER_OF_2(n) (((n) & ((n) - 1)) == 0 && (n) != 0)
@@ -38,7 +37,7 @@ bool haarTransform(std::vector<short>& array) {
     // of the array.
     // https://www.ece.uvic.ca/~frodo/publications/phdthesis.pdf
 
-    short output[array.size()];
+    std::vector<short> output(array.size());
     for (size_t s = array.size(); s >= 2; s /= 2) {
         
         for (unsigned int i = 0; i < s/2; i++) {
@@ -74,7 +73,7 @@ bool ihaarTransform(std::vector<short>& array) {
     // x[2n]   = 2 * avg / 2 (add one to this if the diff is odd)
     // x[2n+1] = x[2n] - y1[n]
     // do this recursively up to the size of the array (2, 4, 8, 16...)
-    short output[array.size()];
+    std::vector<short> output(array.size());
 
     for (size_t s = 2; s <= array.size(); s *= 2) {
         for (unsigned int i = 0; i < s; i++) {
@@ -160,9 +159,10 @@ bool ihaarTransform2D(std::vector<std::vector<short>>& data) {
     return true;
 }
 
-std::unique_ptr<std::vector<short>> encodeImage(unsigned int numChannels,
-                                                unsigned int dim,
-                                                unsigned char* data) {
+std::unique_ptr<std::vector<short>> encodeImage(
+    unsigned int numChannels,
+    unsigned int dim,
+    std::vector<unsigned char>& data) {
     
     // ensure the image dimension is a power of two
     if (! POWER_OF_2(dim))
@@ -244,5 +244,20 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(std::unique_ptr<std::vec
     return toR;
     
 }
+
+#ifdef JAVASCRIPT
+using namespace emscripten;
+EMSCRIPTEN_BINDINGS(my_module) {
+    function("encodeImage", &encodeImage);
+    function("decodeImage", &decodeImage);
+    function("haarTransform", &haarTransform);
+    function("ihaarTransform", &ihaarTransform);
+}
+
+EMSCRIPTEN_BINDINGS(stl_wrappers) {
+    register_vector<short>("VectorShort");
+}
+
+#endif
 
             
