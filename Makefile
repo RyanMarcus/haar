@@ -5,4 +5,4 @@ haar.js: c++
 
 clean:
 	cd c++ && make clean
-	rm haar.js
+	rm -f haar.js haar.js.mem

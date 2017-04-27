@@ -1,8 +1,28 @@
+// < begin copyright > 
+// Copyright Ryan Marcus 2017
+// 
+// This file is part of haar-compression.
+// 
+// haar-compression is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// haar-compression is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with haar-compression.  If not, see <http://www.gnu.org/licenses/>.
+// 
+// < end copyright > 
 #define CATCH_CONFIG_MAIN
 
 #include <memory>
-#include "catch.hpp"
+#include "catch/catch.hpp"
 #include "../haar.h"
+#include "../startstepstop.h"
 #include "../lodepng/lodepng.h"
 
 TEST_CASE("correctly reproduces a test PNG", "[2D]") {
@@ -24,12 +44,86 @@ TEST_CASE("correctly reproduces a test PNG", "[2D]") {
         = decodeImage(std::move(encoded));
 
     // see if the decoded image matches the image we read in...
-    for (unsigned int i = 0; i < width * height; i++) {
+    for (unsigned int i = 0; i < width * height * 4; i++) {
         unsigned char dec = decoded->at(i);
         unsigned char org = image[i];
 
-        REQUIRE(dec == org);
+        // turn them into ints for printing
+        int idec = dec;
+        int iorg = org;
+        
+        REQUIRE(idec == iorg);
     }
+}
+
+TEST_CASE("correctly reproduces a test PNG with SSS encoding", "[2D]") {
+    std::vector<unsigned char> image; //the raw pixels
+    unsigned int width, height;
+    
+    //decode
+    unsigned int error = lodepng::decode(image, width, height, "ff.png");
+    
+    //if there's an error, display it
+    if (error)
+        printf("decoder error: %s\n", lodepng_error_text(error));
+    
+
+    // TODO: failing because we are trying to encode the
+    // channel count and the dimension, which are too high (the dimension).
+    std::unique_ptr<std::vector<short>> encoded
+        = encodeImage(4, width, image);
+
+    std::unique_ptr<std::vector<bool>> compressed
+        = encode(*encoded);
+
+    std::unique_ptr<std::vector<short>> uncompressed
+        = decode(std::move(compressed));
+    
+    std::unique_ptr<std::vector<unsigned char>> decoded
+        = decodeImage(std::move(uncompressed));
+
+    // see if the decoded image matches the image we read in...
+    for (unsigned int i = 0; i < width * height * 4; i++) {
+        unsigned char dec = decoded->at(i);
+        unsigned char org = image[i];
+
+        // turn them into ints for printing
+        int idec = dec;
+        int iorg = org;
+
+        REQUIRE(idec == iorg);
+    }
+}
+
+TEST_CASE("correctly reproduces a small array", "[2D]") {
+    std::vector<unsigned char> image;
+    
+    image.push_back(10);
+    image.push_back(10);
+    image.push_back(10);
+    image.push_back(10);
+
+
+    std::unique_ptr<std::vector<short>> encoded
+        = encodeImage(1, 2, image);
+
+    REQUIRE(encoded->size() == 6);
+    REQUIRE(encoded->at(0) == 1);
+    REQUIRE(encoded->at(1) == 2);
+    REQUIRE(encoded->at(2) == 10);
+    REQUIRE(encoded->at(3) == 0);
+    REQUIRE(encoded->at(4) == 0);
+    REQUIRE(encoded->at(5) == 0);
+
+    std::unique_ptr<std::vector<unsigned char>> decoded
+        = decodeImage(std::move(encoded));
+
+    REQUIRE(decoded->size() == 4);
+    REQUIRE(decoded->at(0) == 10);
+    REQUIRE(decoded->at(1) == 10);
+    REQUIRE(decoded->at(2) == 10);
+    REQUIRE(decoded->at(3) == 10);
+        
 }
 
 TEST_CASE("correctly reproduces 1D input #1", "[1D]") {

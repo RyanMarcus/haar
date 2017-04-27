@@ -16,7 +16,9 @@
 // You should have received a copy of the GNU General Public License
 // along with haar-compression.  If not, see <http://www.gnu.org/licenses/>.
 // 
-// < end copyright >
+// < end copyright > 
+ 
+
 #include "haar.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -187,7 +189,7 @@ std::unique_ptr<std::vector<short>> encodeImage(
     }
 
     // encode each channel
-    for (auto channel : channels)
+    for (auto& channel : channels)
         haarTransform2D(channel);
 
     std::unique_ptr<std::vector<short>> toR(new std::vector<short>());
@@ -228,7 +230,7 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(std::unique_ptr<std::vec
         channels[c] = channel;
     }
 
-    for (auto channel : channels)
+    for (auto& channel : channels)
         ihaarTransform2D(channel);
 
     // recombine the three channels into image data
@@ -256,6 +258,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
 
 EMSCRIPTEN_BINDINGS(stl_wrappers) {
     register_vector<short>("VectorShort");
+    register_vector<unsigned char>("VectorUChar");
 }
 
 #endif

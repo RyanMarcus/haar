@@ -1,3 +1,23 @@
+// < begin copyright > 
+// Copyright Ryan Marcus 2017
+// 
+// This file is part of haar-compression.
+// 
+// haar-compression is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// haar-compression is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with haar-compression.  If not, see <http://www.gnu.org/licenses/>.
+// 
+// < end copyright > 
+ 
 #define CATCH_CONFIG_MAIN
 
 #include <memory>
@@ -30,6 +50,22 @@ TEST_CASE("correctly reproduces a test PNG", "[2D]") {
 
         REQUIRE(dec == org);
     }
+}
+
+TEST_CASE("correctly reproduces a small PNG", "[2D]") {
+    std::vector<unsigned char> image;
+    
+    image.push_back(10);
+    image.push_back(10);
+    image.push_back(10);
+    image.push_back(10);
+
+
+    std::unique_ptr<std::vector<short>> encoded
+        = encodeImage(1, 2, image);
+
+    REQUIRE(encoded.size() == 6);
+    
 }
 
 TEST_CASE("correctly reproduces 1D input #1", "[1D]") {
