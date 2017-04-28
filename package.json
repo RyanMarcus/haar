@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "cd c++ && make test && cd .. && make && node_modules/mocha/bin/mocha",
+    "test": "npm i && cd c++ && make test && cd .. && make && node_modules/mocha/bin/mocha",
     "clean": "make clean"
   },
   "repository": {

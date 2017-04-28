@@ -171,7 +171,7 @@ describe('1d', function() {
     });
 });
 
-describe("image encoding & decoding", function() {
+describe("image haar encoding & decoding", function() {
     it("can encode a simple 1 channel image", function() {
         const vec = new haar.VectorUChar();
 
@@ -295,3 +295,4 @@ describe("image encoding & decoding", function() {
 
 
 });
+

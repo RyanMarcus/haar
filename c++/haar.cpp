@@ -20,6 +20,7 @@
  
 
 #include "haar.h"
+#include "startstepstop.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
