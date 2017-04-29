@@ -103,18 +103,20 @@ int encodeShort(std::vector<bool>& buf, short s) {
 
 std::unique_ptr<std::vector<bool>> encode(std::vector<short>& data) {
     std::unique_ptr<std::vector<bool>> toR(new std::vector<bool>());
+    
 
-
-    std::vector<int> histo(20);
+    //std::vector<int> histo(20);
     
     for (short s : data) {
-        histo[encodeShort(*toR, s)] += 1;
+        //histo[
+        encodeShort(*toR, s);
+        //] += 1;
     }
 
-    for (unsigned int i = 0; i < histo.size(); i++) {
-        if (histo[i] == 0) continue;
-        printf("%d: %d\n", i, histo[i]);
-    }
+    //for (unsigned int i = 0; i < histo.size(); i++) {
+    //   if (histo[i] == 0) continue;
+    //    printf("%d: %d\n", i, histo[i]);
+    //}
     
     encodeShort(*toR, STOP_CODE); // stop code.
     
