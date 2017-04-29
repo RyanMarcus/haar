@@ -17,5 +17,7 @@ std::unique_ptr<std::vector<short>> encodeImage(
     std::vector<unsigned char>& data);
 
 std::unique_ptr<std::vector<unsigned char>> decodeImage(
-    std::unique_ptr<std::vector<short>> encoded);
+    std::unique_ptr<std::vector<short>> encoded,
+    size_t* numChannels = NULL, size_t* dim = NULL);
+
 #endif

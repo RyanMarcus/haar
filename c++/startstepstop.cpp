@@ -21,6 +21,22 @@
 #include "startstepstop.h"
 #include <memory>
 #include <vector>
+#include <stdlib.h>
+#define STOP_CODE 1362
+
+short eot(short s) {
+    if (s < 0)
+        return 2 * abs(s) + 1;
+    else
+        return 2 * s;
+}
+
+short ieot(short s) {
+    if (s % 2 == 0)
+        return s / 2;
+    else
+        return -((s - 1)/2);
+}
 
 // the data ranges from -255 to 255, so we need an appropiate
 // (start, step, stop) code for this range.
@@ -31,55 +47,77 @@
 //     111 0 xxxxxxxxx         (168 - 679)
 //     111 1 xxxxxxxxxxx       (680 - 2727)
 
+int encodeShort(std::vector<bool>& buf, short s) {
+    short us = eot(s);
+
+    if (s < 0) {
+        us = 2*abs(s) + 1;
+    } else {
+        us = 2*s;
+    }
+    
+    int numBits = 0;
+    if (us < 0) {
+        throw std::runtime_error("value out of range for start, stop, step encoder (negative)");
+    } else if (us < 8) {
+        buf.push_back(false);
+        numBits = 3;
+    } else if (us < 40) {
+        buf.push_back(true);
+        buf.push_back(false);
+        numBits = 5;
+        us -= 8;
+    } else if (us < 168) {
+        buf.push_back(true);
+        buf.push_back(true);
+        buf.push_back(false);
+        numBits = 7;
+        us -= 40;
+            
+    } else if (us < 680) {
+        buf.push_back(true);
+        buf.push_back(true);
+        buf.push_back(true);
+        buf.push_back(false);
+        numBits = 9;
+        us -= 168;
+    } else  if (us < 2727) {
+        buf.push_back(true);
+        buf.push_back(true);
+        buf.push_back(true);
+        buf.push_back(true);
+        numBits = 11;
+        us -= 680;
+    } else {
+        throw std::runtime_error("value out of range for start, step, stop encoder (over the max)");
+    }
+
+
+    for (int i = 0; i < numBits; i++) {
+        int mask = 1 << i;
+        buf.push_back(mask & us);
+    }
+
+    return numBits;
+}
+
 std::unique_ptr<std::vector<bool>> encode(std::vector<short>& data) {
     std::unique_ptr<std::vector<bool>> toR(new std::vector<bool>());
 
 
+    std::vector<int> histo(20);
+    
     for (short s : data) {
-        short us = s + 510;
-
-        int numBits = 0;
-        if (us < 0) {
-            throw std::runtime_error("value out of range for start, stop, step encoder");
-        } else if (us < 8) {
-            toR->push_back(false);
-            numBits = 3;
-        } else if (us < 40) {
-            toR->push_back(true);
-            toR->push_back(false);
-            numBits = 5;
-            us -= 8;
-        } else if (us < 168) {
-            toR->push_back(true);
-            toR->push_back(true);
-            toR->push_back(false);
-            numBits = 7;
-            us -= 40;
-            
-        } else if (us < 680) {
-            toR->push_back(true);
-            toR->push_back(true);
-            toR->push_back(true);
-            toR->push_back(false);
-            numBits = 9;
-            us -= 168;
-        } else  if (us < 2727) {
-            toR->push_back(true);
-            toR->push_back(true);
-            toR->push_back(true);
-            toR->push_back(true);
-            numBits = 11;
-            us -= 680;
-        } else {
-            throw std::runtime_error("value out of range for start, step, stop encoder");
-        }
-
-
-        for (int i = 0; i < numBits; i++) {
-            int mask = 1 << i;
-            toR->push_back(mask & us);
-        }
+        histo[encodeShort(*toR, s)] += 1;
     }
+
+    for (unsigned int i = 0; i < histo.size(); i++) {
+        if (histo[i] == 0) continue;
+        printf("%d: %d\n", i, histo[i]);
+    }
+    
+    encodeShort(*toR, STOP_CODE); // stop code.
+    
 
     return toR;   
 }
@@ -143,7 +181,13 @@ std::unique_ptr<std::vector<short>> decode(
         else if (numBits == 11)
             toAdd += 680;
 
-        toR->push_back(toAdd - 510);
+        short val = ieot(toAdd);
+
+        // check for the stop code
+        if (val == STOP_CODE)
+            break;
+
+        toR->push_back(val);
     }
 
     return toR;
@@ -151,21 +195,21 @@ std::unique_ptr<std::vector<short>> decode(
 
 
 /*int main(int argc, char** argv) {
-    std::vector<short> test;
+  std::vector<short> test;
 
-    test.push_back(-121);
+  test.push_back(-121);
 
-    std::unique_ptr<std::vector<bool>> res = encode(test);
+  std::unique_ptr<std::vector<bool>> res = encode(test);
 
-    for (bool b : *res) {
-        printf("%d\n", b);
-    }
+  for (bool b : *res) {
+  printf("%d\n", b);
+  }
 
-    std::unique_ptr<std::vector<short>> dres = decode(std::move(res));
+  std::unique_ptr<std::vector<short>> dres = decode(std::move(res));
 
-    printf("\nresult:\n");
+  printf("\nresult:\n");
     
-    for (short s : *dres) {
-        printf("%d\n", s);
-    }
-    }*/
+  for (short s : *dres) {
+  printf("%d\n", s);
+  }
+  }*/

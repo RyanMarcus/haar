@@ -206,7 +206,9 @@ std::unique_ptr<std::vector<short>> encodeImage(
     return toR;
 }
 
-std::unique_ptr<std::vector<unsigned char>> decodeImage(std::unique_ptr<std::vector<short>> encoded) {
+std::unique_ptr<std::vector<unsigned char>> decodeImage(
+    std::unique_ptr<std::vector<short>> encoded,
+    size_t* ncOut, size_t* dOut) {
     std::vector<short> enc = *(encoded.get());
 
     int numChannels = enc[0];
@@ -244,9 +246,18 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(std::unique_ptr<std::vec
         }
     }
 
+
+    if (ncOut != NULL)
+        *ncOut = numChannels;
+
+    if (dOut != NULL)
+        *dOut = dim;
+    
     return toR;
     
 }
+
+
 
 #ifdef JAVASCRIPT
 using namespace emscripten;

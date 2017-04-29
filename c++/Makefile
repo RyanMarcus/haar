@@ -1,9 +1,9 @@
 CC=g++
-CFLAGS=-Wall -Wpedantic -std=c++11 -O3
+CFLAGS=-Wall -Wpedantic -std=c++11 -g 
 JS_OUT=.
 
-O_FILES=haar.o startstepstop.o libz.a
-O_TEST_FILES=lodepng.o img_test.o sss_test.o
+O_FILES=haar.o startstepstop.o compress_utils.o pinacoth.o libz.a
+O_TEST_FILES=lodepng.o img_test.o sss_test.o compress_test.o pinacoth_test.o
 
 # -s DEMANGLE_SUPPORT=1
 
@@ -15,13 +15,13 @@ test_haar: $(O_FILES) $(O_TEST_FILES)
 	$(CC) $(CFLAGS) $(O_FILES) $(O_TEST_FILES) -o test_haar
 
 lodepng.o: lodepng/
-	$(CC) $(CFLAGS) -g -c lodepng/lodepng.cpp
+	$(CC) $(CFLAGS) -c lodepng/lodepng.cpp
 
 %_test.o: test/%_test.cpp
-	$(CC) $(CFLAGS) -g -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 %.o : %.cpp
-	$(CC) $(CFLAGS) -g -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 libz.a:
 	cd zlib && ./configure --static && make

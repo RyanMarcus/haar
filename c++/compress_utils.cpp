@@ -1,6 +1,10 @@
 #include "zlib/zlib.h"
 #include <memory>
 #include <vector>
+#include <iostream>
+#include <fstream>
+
+
 
 std::unique_ptr<std::vector<unsigned char>>  vecToRaw(
     std::vector<bool>& data) {
@@ -9,67 +13,123 @@ std::unique_ptr<std::vector<unsigned char>>  vecToRaw(
     std::unique_ptr<std::vector<unsigned char>> rdata(new std::vector<unsigned char>());
 
 
-    size_t numChars = (data.size() / CHAR_BIT) + 1;
+    size_t numChars = (data.size() / CHAR_BIT);
+
+    // add padding if we aren't byte aligned
+    if (numChars * CHAR_BIT < data.size())
+        numChars++;
+    
     for (unsigned int i = 0; i < numChars; i++) {
         unsigned char c = 0;
         for (int j = 0; j < CHAR_BIT; j++) {
-            size_t idx = (i * CHAR_BIT) + j;
-            if (idx >= data.size())
-                break;
-
-            c |= data[(i*CHAR_BIT) + j];
             c <<= 1;
+            size_t idx = (i * CHAR_BIT) + j;
+            
+            if (idx >= data.size()) {
+                // shift over the remaining bits
+                c <<= (CHAR_BIT - j) - 1;
+                break;
+            }
+
+            
+            c |= data[(i*CHAR_BIT) + j];
+
         }
 
         rdata->push_back(c);
     }
 
+    
     return rdata;
 }
 
-std::unique_ptr<std::vector<unsigned char>> compress(
+std::unique_ptr<std::vector<unsigned char>> compressVec(
     std::vector<bool>& rdata) {
     
-    z_stream defstream; //deflate stream
-
-    // don't use any custom allocators...
-    defstream.zalloc = Z_NULL;
-    defstream.zfree = Z_NULL;
-    defstream.opaque = Z_NULL;
-
     std::unique_ptr<std::vector<unsigned char>> data = vecToRaw(rdata);
-    unsigned char* buf = (unsigned char*) malloc(data->size());
-    
-    
-    defstream.avail_in = data->size();
-    defstream.next_in = &(data->front());
-    defstream.avail_out = data->size();
-    defstream.next_out = buf;
 
-    deflateInit(&defstream, Z_BEST_COMPRESSION);
-    deflate(&defstream, Z_FINISH);
-    deflateEnd(&defstream);
+    printf("Turned %ld bools into %ld chars\n",
+           rdata.size(), data->size());
 
-    size_t compressedSize = defstream.total_out;
+    // write it out to disk
+    std::ofstream f;
+    f.open("ff.dat", std::ios::binary | std::ios::out);
+
+    for (unsigned char c : *data) {
+        f << c;
+    }
+    
+    f.close();
+
+    printf("wrote %ld chars\n", data->size());
+
+
+    size_t bufSize = compressBound(data->size());
+    unsigned char* buf = (unsigned char*) malloc(bufSize);
+
+    compress(buf, &bufSize, &data->front(), data->size());
 
     // copy it into an appropiately sized buffer
     std::unique_ptr<std::vector<unsigned char>> toR(new std::vector<unsigned char>());
 
-    for (unsigned int i = 0; i < compressedSize; i++) {
+    for (unsigned int i = 0; i < bufSize; i++) {
         toR->push_back(buf[i]);
     }
 
+    free(buf);
+    
+    return toR;
+}
+
+std::unique_ptr<std::vector<bool>> decompressVec(
+    std::vector<unsigned char>& rdata) {
+
+    // start with a 5MB buffer
+    size_t bufSize = 1024 * 1024 * 5;
+    unsigned char* buf = (unsigned char*) malloc(bufSize);
+
+    uncompress(buf, &bufSize, &(rdata.front()), rdata.size());
+
+    // copy into an approp sized buffer
+    std::unique_ptr<std::vector<bool>> toR(new std::vector<bool>());
+
+    for (unsigned int i = 0; i < bufSize; i++) {
+        for (unsigned int j = 0; j < CHAR_BIT; j++) {
+            unsigned char mask = 1 << (CHAR_BIT - (j+1));
+            toR->push_back(buf[i] & mask);
+        }
+    }
+
+    free(buf);
     return toR;
 }
 
 
 
-int main(int argc, char** argv) {
-    std::vector<bool> data = {true, true, false, false,
-                              false, false, false, false, true, true};
+/*int main(int argc, char** argv) {
+    std::vector<bool> data;
+
+    data.push_back(false);
+    for (int i = 0; i < 1000; i++) {
+        data.push_back(true);
+    }
+    data.push_back(false);
+
+    {
+        std::unique_ptr<std::vector<unsigned char>> raw =
+            vecToRaw(data);
+        
+        printf("Uncompressed size: %ld\n", raw->size());
+    }
+                          
 
     std::unique_ptr<std::vector<unsigned char>> compressed =
-        compress(data);
+        compressVec(data);
 
     printf("Compressed size: %ld\n", compressed->size());
-}
+
+    std::unique_ptr<std::vector<bool>> decompressed =
+        decompressVec(*compressed);
+
+    printf("Decompressed size: %ld\n", decompressed->size()/CHAR_BIT);
+    }*/

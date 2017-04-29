@@ -24,6 +24,23 @@
 #include <random>
 
 
+TEST_CASE("correctly reconstructs a very small vector", "[sss]") {
+    std::vector<short> s = {0, 1, -1, 2};
+
+    std::unique_ptr<std::vector<bool>> res = encode(s);
+
+    REQUIRE(res->size() == 4*4 + 15);
+    
+    std::unique_ptr<std::vector<short>> dec = decode(std::move(res));
+
+    REQUIRE(dec->size() == s.size());
+
+    for (unsigned int i = 0; i < s.size(); i++) {
+        REQUIRE(s[i] == dec->at(i));
+    }
+}
+
+
 TEST_CASE("correctly reconstructs a small vector", "[sss]") {
     std::vector<short> s = {5, 10, -20, 31, 62};
 
@@ -43,6 +60,32 @@ TEST_CASE("correctly reconstructs random large vectors", "[sss]") {
     std::uniform_int_distribution<int> d2(1, 512*512);
     
     for (int i = 0; i < 10; i++) {
+        std::vector<short> v;
+        // pick a random length
+        int size = d2(e1);
+
+        for (int j = 0; j < size; j++) {
+            v.push_back(d1(e1));
+        }
+
+        auto enc = encode(v);
+        auto dec = decode(std::move(enc));
+
+        REQUIRE(dec->size() == v.size());
+        for (unsigned int j = 0; j < v.size(); j++) {
+            REQUIRE(dec->at(j) == v[j]);
+        }
+        
+    }
+}
+
+
+TEST_CASE("correctly reconstructs random medium vectors", "[sss]") {
+    std::default_random_engine e1(42);
+    std::uniform_int_distribution<int> d1(-510, 509);
+    std::uniform_int_distribution<int> d2(1, 512);
+    
+    for (int i = 0; i < 1000; i++) {
         std::vector<short> v;
         // pick a random length
         int size = d2(e1);
