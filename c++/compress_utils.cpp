@@ -48,10 +48,8 @@ std::unique_ptr<std::vector<unsigned char>> compressVec(
     
     std::unique_ptr<std::vector<unsigned char>> data = vecToRaw(rdata);
 
-    printf("Turned %ld bools into %ld chars\n",
-           rdata.size(), data->size());
 
-    // write it out to disk
+    /*// write it out to disk
     std::ofstream f;
     f.open("ff.dat", std::ios::binary | std::ios::out);
 
@@ -59,9 +57,8 @@ std::unique_ptr<std::vector<unsigned char>> compressVec(
         f << c;
     }
     
-    f.close();
+    f.close();*/
 
-    printf("wrote %ld chars\n", data->size());
 
 
     size_t bufSize = compressBound(data->size());
