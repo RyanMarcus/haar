@@ -162,6 +162,62 @@ bool ihaarTransform2D(std::vector<std::vector<short>>& data) {
     return true;
 }
 
+
+bool haarTransform2DFlat(std::vector<short>& data, int dim) {
+    std::vector<std::vector<short>> d;
+
+    for (int i = 0; i < dim; i++) {
+        std::vector<short> row;
+        for (int j = 0; j < dim; j++) {
+            row.push_back(data[i*dim + j]);
+        }
+
+        d.push_back(row);
+    }
+
+    bool res = haarTransform2D(d);
+
+    if (!res)
+        return false;
+    
+    int i = 0;
+    for (auto& row : d) {
+        for (short s : row) {
+            data[i++] = s;
+        }
+    }
+
+    return true;
+        
+}
+
+bool ihaarTransform2DFlat(std::vector<short>& data, int dim) {
+    std::vector<std::vector<short>> d;
+
+    for (int i = 0; i < dim; i++) {
+        std::vector<short> row;
+        for (int j = 0; j < dim; j++) {
+            row.push_back(data[i*dim + j]);
+        }
+
+        d.push_back(row);
+    }
+
+    bool res = ihaarTransform2D(d);
+
+    if (!res)
+        return false;
+    
+    int i = 0;
+    for (auto& row : d) {
+        for (short s : row) {
+            data[i++] = s;
+        }
+    }
+
+    return true;
+}
+
 std::unique_ptr<std::vector<short>> encodeImage(
     unsigned int numChannels,
     unsigned int dim,
@@ -272,6 +328,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
     function("decodeImage", &decodeImageW);
     function("haarTransform", &haarTransform);
     function("ihaarTransform", &ihaarTransform);
+    function("haarTransform2D", &haarTransform2DFlat);
+    function("ihaarTransform2D", &ihaarTransform2DFlat);
 }
 
 EMSCRIPTEN_BINDINGS(stl_wrappers) {
