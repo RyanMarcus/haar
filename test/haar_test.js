@@ -171,6 +171,43 @@ describe('1d', function() {
     });
 });
 
+describe("2d", function() {
+    it("can encode and decode a 2d array", function() {
+        const vec = new haar.VectorShort();
+
+        for (let i = 0; i < 16*16; i++) {
+            vec.push_back(i);
+        }
+
+        assert.equal(true, haar.haarTransform2D(vec, 16));
+        assert.notEqual(0, vec.get(0));
+        assert.equal(true, haar.ihaarTransform2D(vec, 16));
+
+        for (let i = 0; i < 12*12; i++) {
+            assert.equal(i, vec.get(i));
+        }
+        
+    });
+
+
+    it("can encode and decode a larger 2d arrays", function() {
+        const vec = new haar.VectorShort();
+
+        for (let i = 0; i < 32*32; i++) {
+            vec.push_back(i);
+        }
+
+        assert.equal(true, haar.haarTransform2D(vec, 32));
+        assert.notEqual(0, vec.get(0));
+        assert.equal(true, haar.ihaarTransform2D(vec, 32));
+
+        for (let i = 0; i < 12*12; i++) {
+            assert.equal(i, vec.get(i));
+        }
+        
+    });
+});
+
 describe("image haar encoding & decoding", function() {
     it("can encode a simple 1 channel image", function() {
         const vec = new haar.VectorUChar();
