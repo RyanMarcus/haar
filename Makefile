@@ -9,4 +9,4 @@ clean:
 
 dist: haar.js
 	cd c++ && make clean
-	rm haar.js.mem
+
