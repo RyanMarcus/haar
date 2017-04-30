@@ -2,7 +2,7 @@
   "name": "haar",
   "version": "0.0.1",
   "description": "A Haar wavelet image compression algorithm ",
-  "main": "index.js",
+  "main": "haar.js",
   "directories": {
     "test": "test"
   },
