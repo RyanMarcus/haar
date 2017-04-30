@@ -206,6 +206,12 @@ std::unique_ptr<std::vector<short>> encodeImage(
     return toR;
 }
 
+
+std::unique_ptr<std::vector<unsigned char>> decodeImageW(
+    std::unique_ptr<std::vector<short>> encoded) {
+    return decodeImage(std::move(encoded), NULL, NULL);
+}
+
 std::unique_ptr<std::vector<unsigned char>> decodeImage(
     std::unique_ptr<std::vector<short>> encoded,
     size_t* ncOut, size_t* dOut) {
@@ -263,7 +269,7 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(
 using namespace emscripten;
 EMSCRIPTEN_BINDINGS(my_module) {
     function("encodeImage", &encodeImage);
-    function("decodeImage", &decodeImage);
+    function("decodeImage", &decodeImageW);
     function("haarTransform", &haarTransform);
     function("ihaarTransform", &ihaarTransform);
 }
