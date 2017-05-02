@@ -218,10 +218,13 @@ bool ihaarTransform2DFlat(std::vector<short>& data, int dim) {
     return true;
 }
 
-void threshold(std::vector<short>& s, short thres) {
-    for (int i = 2; i < s.size(); i++) {
-        if (abs(s[i]) < thres)
+void threshold(std::vector<short>& s, short thres, int maxNum) {
+    int removed = 0;
+    for (int i = 2; i < s.size() && removed < maxNum; i++) {
+        if (abs(s[i]) < thres) {
             s[i] = 0;
+            removed++;
+        }
     }
 }
 
