@@ -218,6 +218,13 @@ bool ihaarTransform2DFlat(std::vector<short>& data, int dim) {
     return true;
 }
 
+void threshold(std::vector<short>& s, short thres) {
+    for (int i = 2; i < s.size(); i++) {
+        if (abs(s[i]) < thres)
+            s[i] = 0;
+    }
+}
+
 std::unique_ptr<std::vector<short>> encodeImage(
     unsigned int numChannels,
     unsigned int dim,
@@ -330,6 +337,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     function("ihaarTransform", &ihaarTransform);
     function("haarTransform2D", &haarTransform2DFlat);
     function("ihaarTransform2D", &ihaarTransform2DFlat);
+    function("threshold", &threshold);
 }
 
 EMSCRIPTEN_BINDINGS(stl_wrappers) {
