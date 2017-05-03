@@ -325,8 +325,10 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(
         for (int c = 0; c < numChannels; c++) {
             short value = channels[c][row][col];
             // clamp the values
-            value = std::max((short)255, value);
-            value = std::min((short)0, value);
+            if (value > 255)
+                value = 255;
+            else if (value < 0)
+                value = 0;
             
             toR->push_back(channels[c][row][col]);
         }
