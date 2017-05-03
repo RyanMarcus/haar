@@ -222,7 +222,7 @@ long threshold(std::vector<short>& s, int maxNum) {
     int removed = 0;
     long engRemoved = 0;
     for (short thres = 1; thres < 100; thres++) {
-        for (int i = 2; i < s.size() && removed < maxNum; i++) {
+        for (unsigned int i = 2; i < s.size() && removed < maxNum; i++) {
             if (s[i] != 0 && abs(s[i]) <= thres) {
                 engRemoved += abs(s[i]);
                 s[i] = 0;
@@ -317,12 +317,17 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(
     for (auto& channel : channels)
         ihaarTransform2D(channel);
 
-    // recombine the three channels into image data
+    // recombine the channels into image data
     std::unique_ptr<std::vector<unsigned char>> toR(new std::vector<unsigned char>);
     for (int i = 0; i < dim*dim; i++) {
         int row = i / dim;
         int col = i % dim;
         for (int c = 0; c < numChannels; c++) {
+            short value = channels[c][row][col];
+            // clamp the values
+            value = std::max((short)255, value);
+            value = std::min((short)0, value);
+            
             toR->push_back(channels[c][row][col]);
         }
     }

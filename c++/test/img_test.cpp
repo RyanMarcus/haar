@@ -68,8 +68,6 @@ TEST_CASE("correctly reproduces a test PNG with SSS encoding", "[2D]") {
         printf("decoder error: %s\n", lodepng_error_text(error));
     
 
-    // TODO: failing because we are trying to encode the
-    // channel count and the dimension, which are too high (the dimension).
     std::unique_ptr<std::vector<short>> encoded
         = encodeImage(4, width, image);
 
@@ -93,6 +91,36 @@ TEST_CASE("correctly reproduces a test PNG with SSS encoding", "[2D]") {
 
         REQUIRE(idec == iorg);
     }
+}
+
+
+TEST_CASE("SSS encoding and thresholding", "[2D]") {
+    std::vector<unsigned char> image; //the raw pixels
+    unsigned int width, height;
+    
+    //decode
+    unsigned int error = lodepng::decode(image, width, height, "ff.png");
+    
+    //if there's an error, display it
+    if (error)
+        printf("decoder error: %s\n", lodepng_error_text(error));
+    
+
+    std::unique_ptr<std::vector<short>> encoded
+        = encodeImage(4, width, image);
+
+    std::unique_ptr<std::vector<bool>> compressed
+        = encode(*encoded);
+
+    
+    std::unique_ptr<std::vector<short>> uncompressed
+        = decode(std::move(compressed));
+
+    threshold(*uncompressed, 1000);
+    
+    std::unique_ptr<std::vector<unsigned char>> decoded
+        = decodeImage(std::move(uncompressed));
+
 }
 
 TEST_CASE("correctly reproduces a small array", "[2D]") {
