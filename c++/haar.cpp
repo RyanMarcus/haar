@@ -330,7 +330,7 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(
             else if (value < 0)
                 value = 0;
             
-            toR->push_back(channels[c][row][col]);
+            toR->push_back(value);
         }
     }
 
