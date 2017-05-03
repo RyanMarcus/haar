@@ -224,7 +224,7 @@ long threshold(std::vector<short>& s, int maxNum) {
     for (short thres = 1; thres < 100; thres++) {
         for (int i = s.size()-1; i > 2 && removed < maxNum; i--) {
             if (s[i] != 0 && abs(s[i]) <= thres) {
-                engRemoved += s[i];
+                engRemoved += abs(s[i]);
                 s[i] = 0;
                 removed++;
             }
