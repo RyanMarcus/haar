@@ -1,10 +1,11 @@
 #include "util.h"
 
 std::unique_ptr<std::vector<unsigned char>> memToVec(
-    unsigned char* data,
+    void* data,
     size_t count) {
 
+    unsigned char* d = (unsigned char*) data;
     std::unique_ptr<std::vector<unsigned char>> v(
-        new std::vector<unsigned char>(data, data + count));
+        new std::vector<unsigned char>(d, d + count));
     return v;
 }

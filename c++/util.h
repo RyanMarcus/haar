@@ -5,7 +5,7 @@
 #include <vector>
 
 std::unique_ptr<std::vector<unsigned char>> memToVec(
-    unsigned char* data,
+    void* data,
     size_t count);
 
 
