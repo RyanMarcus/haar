@@ -21,6 +21,7 @@
 
 #include "haar.h"
 #include "startstepstop.h"
+#include "util.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -357,6 +358,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     function("haarTransform2D", &haarTransform2DFlat);
     function("ihaarTransform2D", &ihaarTransform2DFlat);
     function("threshold", &threshold);
+    function("memToVec", &memToVec, allow_raw_pointers());
 }
 
 EMSCRIPTEN_BINDINGS(stl_wrappers) {
