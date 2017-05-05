@@ -21,6 +21,7 @@
 
 #include "haar.h"
 #include "startstepstop.h"
+#include "compress_utils.h"
 #include "util.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -351,6 +352,8 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(
 #ifdef JAVASCRIPT
 using namespace emscripten;
 EMSCRIPTEN_BINDINGS(my_module) {
+    function("sssEncode", &encode);
+    function("zip", &compressVec);
     function("encodeImage", &encodeImage);
     function("decodeImage", &decodeImageW);
     function("haarTransform", &haarTransform);
@@ -358,7 +361,6 @@ EMSCRIPTEN_BINDINGS(my_module) {
     function("haarTransform2D", &haarTransform2DFlat);
     function("ihaarTransform2D", &ihaarTransform2DFlat);
     function("threshold", &threshold);
-    function("memToVec", &memToVec, allow_raw_pointers());
 }
 
 EMSCRIPTEN_BINDINGS(stl_wrappers) {
