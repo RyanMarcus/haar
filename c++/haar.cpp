@@ -347,13 +347,18 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(
     
 }
 
+std::unique_ptr<std::vector<unsigned char>> compress(std::vector<short>& data) {
+    std::unique_ptr<std::vector<bool>> sss = encode(data);
+    auto compressed = compressVec(*sss);
+
+    return compressed;
+}
 
 
 #ifdef JAVASCRIPT
 using namespace emscripten;
 EMSCRIPTEN_BINDINGS(my_module) {
-    function("sssEncode", &encode);
-    function("zip", &compressVec);
+    function("compress", &compress);
     function("encodeImage", &encodeImage);
     function("decodeImage", &decodeImageW);
     function("haarTransform", &haarTransform);
