@@ -9,7 +9,7 @@ O_TEST_FILES=lodepng.o img_test.o sss_test.o compress_test.o pinacoth_test.o
 
 
 haar.js: haar.cpp util.cpp startstepstop.cpp zlibjs.a
-	em++ $(CFLAGS) --bind -DJAVASCRIPT -s TOTAL_MEMORY=536870912 --memory-init-file 0 --pre-js front.js zlibjs.a haar.cpp util.cpp startstepstop.cpp -o $(JS_OUT)/haar.js
+	em++ $(CFLAGS) --bind -DJAVASCRIPT -s TOTAL_MEMORY=536870912 --memory-init-file 0 --pre-js front.js compress_utils.cpp haar.cpp util.cpp startstepstop.cpp zlibjs.a -o $(JS_OUT)/haar.js
 
 test_haar: $(O_FILES) $(O_TEST_FILES)
 	$(CC) $(CFLAGS) $(O_FILES) $(O_TEST_FILES) -o test_haar
@@ -28,7 +28,7 @@ libz.a:
 	mv zlib/libz.a .
 
 zlibjs.a: 
-	cd zlib && ./configure --static && make CC=emcc
+	cd zlib && env CC=emcc ./configure --static && make CC=emcc
 	mv zlib/libz.a zlibjs.a
 
 .phony: clean test

@@ -61,7 +61,7 @@ std::unique_ptr<std::vector<unsigned char>> compressVec(
 
 
 
-    size_t bufSize = compressBound(data->size());
+    unsigned long bufSize = compressBound(data->size());
     unsigned char* buf = (unsigned char*) malloc(bufSize);
 
     compress(buf, &bufSize, &data->front(), data->size());
@@ -82,7 +82,7 @@ std::unique_ptr<std::vector<bool>> decompressVec(
     std::vector<unsigned char>& rdata) {
 
     // start with a 5MB buffer
-    size_t bufSize = 1024 * 1024 * 5;
+    unsigned long bufSize = 1024 * 1024 * 5;
     unsigned char* buf = (unsigned char*) malloc(bufSize);
 
     uncompress(buf, &bufSize, &(rdata.front()), rdata.size());
