@@ -49,12 +49,6 @@ short ieot(short s) {
 
 int encodeShort(std::vector<bool>& buf, short s) {
     short us = eot(s);
-
-    if (s < 0) {
-        us = 2*abs(s) + 1;
-    } else {
-        us = 2*s;
-    }
     
     int numBits = 0;
     if (us < 0) {
