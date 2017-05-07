@@ -13,6 +13,7 @@ bool ihaarTransform(std::vector<short>& array);
 
 long threshold(std::vector<short>& array, int count);
 long threshold2(std::vector<short>& array, int count);
+long threshold3(std::vector<short>& array, int count);
 
 std::unique_ptr<std::vector<short>> encodeImage(
     unsigned int numChannels,

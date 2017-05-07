@@ -26,6 +26,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <queue>
+#include <vector>
+#include <memory>
 
 #define POWER_OF_2(n) (((n) & ((n) - 1)) == 0 && (n) != 0)
 
@@ -220,10 +223,73 @@ bool ihaarTransform2DFlat(std::vector<short>& data, int dim) {
     return true;
 }
 
+typedef std::pair<long, int> IndexedValue;
+long threshold3(std::vector<short>& s, int maxNum) {
+
+    size_t channels = s[0];
+    size_t dim = s[1];    
+    
+    // build the impact map of each coeff -- the sum of the
+    // absolute values of the filter / bases
+    std::vector<long> impact(dim*dim);
+
+    for (size_t i = 0; i < dim*dim; i++) {
+        std::vector<short> buf(dim*dim);
+        buf[i] = 256;
+        ihaarTransform2DFlat(buf, dim);
+
+        long accum = 0;
+        for (short s : buf) {
+            accum += abs(s);
+        }
+
+        impact[i] = accum;
+    }
+
+    
+    // build a priority queue of the maxNum smallest impact
+    // elements that can be zeroed.
+    auto cmp = [](IndexedValue left, IndexedValue right) {
+        return left.first - right.first;
+    };
+    
+    std::priority_queue<IndexedValue,
+                        std::vector<IndexedValue>,
+                        decltype(cmp)> pq(cmp);
+    
+    
+    for (size_t channel = 0; channel < channels; channel++) {
+        for (size_t idx = 0; idx < dim*dim; idx++) {
+            int gIdx = channel * (dim*dim) + idx + 2;
+            long val = s[gIdx];
+            val *= impact[idx];
+            
+            pq.push(IndexedValue(val, gIdx));
+
+            while (pq.size() > (unsigned int)maxNum)
+                pq.pop();
+        }
+    }
+
+    // now zero all the values in the pq
+    long accum = 0;
+    while (!pq.empty()) {
+        IndexedValue iv = pq.top();
+        pq.pop();
+        accum += s[iv.second];
+        s[iv.second] = 0;
+    }
+
+    return accum;
+
+        
+
+}
+
 long threshold2(std::vector<short>& s, int maxNum) {
     // zero maxNum non-zero high-frequency components,
     size_t channels = s[0];
-    size_t dim = s[1];
+    size_t dim = s[1];    
 
     // start zeroing components. Start with the bottom right most
     // value, moving all the way up that column and then all the way down
@@ -419,6 +485,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     function("ihaarTransform2D", &ihaarTransform2DFlat);
     function("threshold", &threshold);
     function("threshold2", &threshold2);
+    function("threshold3", &threshold3);
 }
 
 EMSCRIPTEN_BINDINGS(stl_wrappers) {

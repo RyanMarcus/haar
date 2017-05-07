@@ -145,6 +145,28 @@ TEST_CASE("advanced thresholding", "[threshold]") {
 
 }
 
+TEST_CASE("impact-based advanced thresholding", "[threshold]") {
+    std::vector<unsigned char> image; //the raw pixels
+    unsigned int width, height;
+    
+    //decode
+    unsigned int error = lodepng::decode(image, width, height, "ff.png");
+    
+    //if there's an error, display it
+    if (error)
+        printf("decoder error: %s\n", lodepng_error_text(error));
+    
+
+    std::unique_ptr<std::vector<short>> encoded
+        = encodeImage(4, width, image);
+
+    threshold3(*encoded, 1000);
+    
+    std::unique_ptr<std::vector<unsigned char>> decoded
+        = decodeImage(std::move(encoded));
+
+}
+
 TEST_CASE("correctly reproduces a small array", "[2D]") {
     std::vector<unsigned char> image;
     
