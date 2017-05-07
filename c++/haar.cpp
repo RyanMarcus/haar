@@ -255,12 +255,11 @@ long threshold2(std::vector<short>& s, int maxNum) {
                 gIdx += channel * (dim*dim);
                 gIdx += 2; // for the channel count and the dimension
 
-                if (gIdx >= s.size()) {
-                    printf("!!!\n");
-                }
+
                 if (s[gIdx] != 0) {
+                    toR += s[gIdx];
                     s[gIdx] = 0;
-                    if (++toR >= maxNum)
+                    if (toR >= maxNum)
                         return toR;
                 }
                 
