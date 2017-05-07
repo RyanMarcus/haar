@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-Wall -Wpedantic -std=c++11 -g -O3
+CFLAGS=-Wall -Wpedantic -std=c++11 -g 
 JS_OUT=.
 
 O_FILES=haar.o startstepstop.o compress_utils.o pinacoth.o libz.a

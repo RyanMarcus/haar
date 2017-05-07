@@ -94,7 +94,7 @@ TEST_CASE("correctly reproduces a test PNG with SSS encoding", "[2D]") {
 }
 
 
-TEST_CASE("SSS encoding and thresholding", "[2D]") {
+TEST_CASE("SSS encoding and thresholding", "[threshold]") {
     std::vector<unsigned char> image; //the raw pixels
     unsigned int width, height;
     
@@ -120,6 +120,28 @@ TEST_CASE("SSS encoding and thresholding", "[2D]") {
     
     std::unique_ptr<std::vector<unsigned char>> decoded
         = decodeImage(std::move(uncompressed));
+
+}
+
+TEST_CASE("advanced thresholding", "[threshold]") {
+    std::vector<unsigned char> image; //the raw pixels
+    unsigned int width, height;
+    
+    //decode
+    unsigned int error = lodepng::decode(image, width, height, "ff.png");
+    
+    //if there's an error, display it
+    if (error)
+        printf("decoder error: %s\n", lodepng_error_text(error));
+    
+
+    std::unique_ptr<std::vector<short>> encoded
+        = encodeImage(4, width, image);
+
+    threshold2(*encoded, 1000);
+    
+    std::unique_ptr<std::vector<unsigned char>> decoded
+        = decodeImage(std::move(encoded));
 
 }
 

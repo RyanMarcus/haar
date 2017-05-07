@@ -235,7 +235,7 @@ long threshold2(std::vector<short>& s, int maxNum) {
     // |    86420
     long toR = 0;
     for (size_t diagPoint = dim-1; diagPoint != 0; diagPoint--) {
-        for (size_t rowColIdx = 0; rowColIdx < dim*2; rowColIdx++) {
+        for (size_t rowColIdx = 0; rowColIdx < diagPoint*2; rowColIdx++) {
             short idx = rowColIdx / 2;
             short x, y;
             if (rowColIdx % 2 == 0) {
@@ -251,10 +251,13 @@ long threshold2(std::vector<short>& s, int maxNum) {
 
             for (size_t channel = 0; channel < channels; channel++) {
                 // find this point in each channel.
-                short gIdx = y*dim + x;
+                int gIdx = y*dim + x;
                 gIdx += channel * (dim*dim);
                 gIdx += 2; // for the channel count and the dimension
 
+                if (gIdx >= s.size()) {
+                    printf("!!!\n");
+                }
                 if (s[gIdx] != 0) {
                     s[gIdx] = 0;
                     if (++toR >= maxNum)

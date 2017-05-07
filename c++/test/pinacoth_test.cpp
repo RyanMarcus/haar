@@ -45,3 +45,5 @@ TEST_CASE("correctly reproduces a test png", "[e2e]") {
         REQUIRE(idec == iorg);
     }
 }
+
+
