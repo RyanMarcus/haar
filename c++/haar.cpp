@@ -220,6 +220,57 @@ bool ihaarTransform2DFlat(std::vector<short>& data, int dim) {
     return true;
 }
 
+long threshold2(std::vector<short>& s, int maxNum) {
+    // zero maxNum non-zero high-frequency components,
+    size_t channels = s[0];
+    size_t dim = s[1];
+
+    // start zeroing components. Start with the bottom right most
+    // value, moving all the way up that column and then all the way down
+    // that row.
+    // |        7
+    // |        5
+    // |        3
+    // |        1
+    // |    86420
+    long toR = 0;
+    for (size_t diagPoint = dim-1; diagPoint != 0; diagPoint--) {
+        for (size_t rowColIdx = 0; rowColIdx < dim*2; rowColIdx++) {
+            short idx = rowColIdx / 2;
+            short x, y;
+            if (rowColIdx % 2 == 0) {
+                // the row
+                x = diagPoint - idx;
+                y = diagPoint;
+            } else {
+                // the column
+                x = diagPoint;
+                y = diagPoint - idx;
+            }
+
+
+            for (size_t channel = 0; channel < channels; channel++) {
+                // find this point in each channel.
+                short gIdx = y*dim + x;
+                gIdx += channel * (dim*dim);
+                gIdx += 2; // for the channel count and the dimension
+
+                if (s[gIdx] != 0) {
+                    s[gIdx] = 0;
+                    if (++toR >= maxNum)
+                        return toR;
+                }
+                
+            }
+        }
+    }
+
+    // we went through the whole image, didn't find enough things to zero
+    return toR;
+    
+    
+}
+
 long threshold(std::vector<short>& s, int maxNum) {
     int removed = 0;
     long engRemoved = 0;
@@ -350,7 +401,6 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(
 std::unique_ptr<std::vector<unsigned char>> compress(std::vector<short>& data) {
     std::unique_ptr<std::vector<bool>> sss = encode(data);
     auto compressed = compressVec(*sss);
-
     return compressed;
 }
 
@@ -366,6 +416,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     function("haarTransform2D", &haarTransform2DFlat);
     function("ihaarTransform2D", &ihaarTransform2DFlat);
     function("threshold", &threshold);
+    function("threshold2", &threshold2);
 }
 
 EMSCRIPTEN_BINDINGS(stl_wrappers) {
