@@ -257,8 +257,8 @@ long threshold2(std::vector<short>& s, int maxNum) {
 
 
                 if (s[gIdx] != 0) {
-                    toR += abs(s[gIdx]/2);
-                    s[gIdx] = s[gIdx]/2;
+                    toR += abs(s[gIdx]);
+                    s[gIdx] = 0;
                     if (toR >= maxNum)
                         return toR;
                 }
