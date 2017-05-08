@@ -313,7 +313,6 @@ long threshold3(std::vector<short>& s, int maxNum) {
     while (!pq.empty()) {
         IndexedValue iv = pq.top();
         pq.pop();
-        printf("%f @ %d popped\n", fabs(iv.first), iv.second);
         accum += abs(s[iv.second]);
         s[iv.second] = 0;
     }
