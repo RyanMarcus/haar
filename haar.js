@@ -8927,7 +8927,7 @@ function __Z10threshold3RNSt3__26vectorIsNS_9allocatorIsEEEEi($0, $1) {
       $63 = (($59 >> 3) + -2 | 0) / 2 | 0;
       $64 = $56 + ($63 << 3) | 0;
       $66 = $$in + -8 | 0;
-      if (+HEAPF32[$64 >> 2] - +HEAPF32[$66 >> 2] != 0.0) {
+      if (+HEAPF32[$66 >> 2] - +HEAPF32[$64 >> 2] != 0.0) {
        $70 = $66;
        $72 = HEAP32[$70 >> 2] | 0;
        $75 = HEAP32[$70 + 4 >> 2] | 0;
@@ -8942,7 +8942,7 @@ function __Z10threshold3RNSt3__26vectorIsNS_9allocatorIsEEEEi($0, $1) {
         if (!$$0$i$i$i) break;
         $$0$i$i$i = ($$0$i$i$i + -1 | 0) / 2 | 0;
         $84 = $56 + ($$0$i$i$i << 3) | 0;
-        if (!(+HEAPF32[$84 >> 2] - $76 != 0.0)) break; else {
+        if (!($76 - +HEAPF32[$84 >> 2] != 0.0)) break; else {
          $$sroa$026$0$in$i$i$i$phi = $$sroa$020$0$in$i$i$i;
          $$sroa$020$0$in$i$i$i = $84;
          $$sroa$026$0$in$i$i$i = $$sroa$026$0$in$i$i$i$phi;
@@ -8977,7 +8977,7 @@ function __Z10threshold3RNSt3__26vectorIsNS_9allocatorIsEEEEi($0, $1) {
          $110 = $100 + -3 | 0;
          $111 = ($110 | 0) / 2 | 0;
          if (($110 | 0) >= -1) {
-          if (($108 | 0) > 2) if (+HEAPF32[$93 >> 2] - +HEAPF32[$95 >> 2] != 0.0) {
+          if (($108 | 0) > 2) if (+HEAPF32[$95 >> 2] - +HEAPF32[$93 >> 2] != 0.0) {
            $$0$i$i$i$i = 2;
            $$sroa$030$0$i$i$i$i = $96;
           } else {
@@ -8987,7 +8987,7 @@ function __Z10threshold3RNSt3__26vectorIsNS_9allocatorIsEEEEi($0, $1) {
            $$0$i$i$i$i = 1;
            $$sroa$030$0$i$i$i$i = $94;
           }
-          if (!(+HEAPF32[$$sroa$030$0$i$i$i$i >> 2] - +HEAPF32[$56 >> 2] != 0.0)) {
+          if (!(+HEAPF32[$56 >> 2] - +HEAPF32[$$sroa$030$0$i$i$i$i >> 2] != 0.0)) {
            $123 = $56;
            $125 = HEAP32[$123 >> 2] | 0;
            $128 = HEAP32[$123 + 4 >> 2] | 0;
@@ -9007,7 +9007,7 @@ function __Z10threshold3RNSt3__26vectorIsNS_9allocatorIsEEEEi($0, $1) {
             $143 = $140 + 1 | 0;
             do if (($143 | 0) < ($108 | 0)) {
              $146 = $141 + 8 | 0;
-             if (!(+HEAPF32[$141 >> 2] - +HEAPF32[$146 >> 2] != 0.0)) {
+             if (!(+HEAPF32[$146 >> 2] - +HEAPF32[$141 >> 2] != 0.0)) {
               $$2$i$i$i$i = $140;
               $$sroa$030$2$i$i$i$i = $142;
               break;
@@ -9018,7 +9018,7 @@ function __Z10threshold3RNSt3__26vectorIsNS_9allocatorIsEEEEi($0, $1) {
              $$2$i$i$i$i = $140;
              $$sroa$030$2$i$i$i$i = $142;
             } while (0);
-            if (+HEAPF32[$$sroa$030$2$i$i$i$i >> 2] - $129 == 0.0) {
+            if ($129 - +HEAPF32[$$sroa$030$2$i$i$i$i >> 2] == 0.0) {
              $$sroa$042$0$i$i$i$i$phi = $$sroa$030$1$i$i$i$i;
              $$1$i$i$i$i = $$2$i$i$i$i;
              $$sroa$030$1$i$i$i$i = $$sroa$030$2$i$i$i$i;
@@ -9084,7 +9084,7 @@ function __Z10threshold3RNSt3__26vectorIsNS_9allocatorIsEEEEi($0, $1) {
       $172 = $163 + -3 | 0;
       $173 = ($172 | 0) / 2 | 0;
       if (($172 | 0) >= -1) {
-       if (($170 | 0) > 2) if (+HEAPF32[$25 >> 2] - +HEAPF32[$27 >> 2] != 0.0) {
+       if (($170 | 0) > 2) if (+HEAPF32[$27 >> 2] - +HEAPF32[$25 >> 2] != 0.0) {
         $$0$i$i$i$i66 = 2;
         $$sroa$030$0$i$i$i$i65 = $28;
        } else {
@@ -9094,7 +9094,7 @@ function __Z10threshold3RNSt3__26vectorIsNS_9allocatorIsEEEEi($0, $1) {
         $$0$i$i$i$i66 = 1;
         $$sroa$030$0$i$i$i$i65 = $26;
        }
-       if (!(+HEAPF32[$$sroa$030$0$i$i$i$i65 >> 2] - +HEAPF32[$21 >> 2] != 0.0)) {
+       if (!(+HEAPF32[$21 >> 2] - +HEAPF32[$$sroa$030$0$i$i$i$i65 >> 2] != 0.0)) {
         $185 = $21;
         $187 = HEAP32[$185 >> 2] | 0;
         $190 = HEAP32[$185 + 4 >> 2] | 0;
@@ -9114,7 +9114,7 @@ function __Z10threshold3RNSt3__26vectorIsNS_9allocatorIsEEEEi($0, $1) {
          $205 = $202 + 1 | 0;
          if (($205 | 0) < ($170 | 0)) {
           $208 = $203 + 8 | 0;
-          if (+HEAPF32[$203 >> 2] - +HEAPF32[$208 >> 2] != 0.0) {
+          if (+HEAPF32[$208 >> 2] - +HEAPF32[$203 >> 2] != 0.0) {
            $$2$i$i$i$i74 = $205;
            $$sroa$030$2$i$i$i$i73 = $208;
           } else {
@@ -9125,7 +9125,7 @@ function __Z10threshold3RNSt3__26vectorIsNS_9allocatorIsEEEEi($0, $1) {
           $$2$i$i$i$i74 = $202;
           $$sroa$030$2$i$i$i$i73 = $204;
          }
-         if (+HEAPF32[$$sroa$030$2$i$i$i$i73 >> 2] - $191 == 0.0) {
+         if ($191 - +HEAPF32[$$sroa$030$2$i$i$i$i73 >> 2] == 0.0) {
           $$sroa$042$0$i$i$i$i71$phi = $$sroa$030$1$i$i$i$i70;
           $$1$i$i$i$i72 = $$2$i$i$i$i74;
           $$sroa$030$1$i$i$i$i70 = $$sroa$030$2$i$i$i$i73;

@@ -281,7 +281,7 @@ long threshold3(std::vector<short>& s, int maxNum) {
     // build a priority queue of the maxNum smallest impact
     // elements that can be zeroed.
     auto cmp = [](IndexedValue left, IndexedValue right) {
-        return left.first - right.first;
+        return right.first - left.first;
     };
     
     std::priority_queue<IndexedValue,
