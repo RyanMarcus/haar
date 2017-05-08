@@ -97,7 +97,7 @@ bool ihaarTransform(std::vector<short>& array) {
             }
         }
 
-        
+
         // now copy output into the array
         for (unsigned int i = 0; i < s; i++) {
             array[i] = output[i];
@@ -223,29 +223,60 @@ bool ihaarTransform2DFlat(std::vector<short>& data, int dim) {
     return true;
 }
 
-typedef std::pair<long, int> IndexedValue;
+uint32_t flp2(uint32_t x) {
+    x = x | (x >> 1);
+    x = x | (x >> 2);
+    x = x | (x >> 4);
+    x = x | (x >> 8);
+    x = x | (x >> 16);
+    return x - (x >> 1);
+}
+
+float calcFrac(size_t x) {
+    if (x == 0) return 1.0f;
+    uint32_t floorPowerOf2 = flp2(x);
+
+    return 1.0f / (float)floorPowerOf2;
+    
+}
+
+std::unique_ptr<std::vector<float>> calculateImpact(size_t dim) {
+    // along each dimension:
+    // at 0, we are dim.
+    // at 1, we are dim
+    // at 2-3, we are 1/2 dim
+    // at 4-7, we are 1/4 dim
+    // at 8-15, we are 1/8 dim
+    // at 16-31, we are 1/16 dim
+
+    // so for an x, y point, it is the product. for example,
+    // at (1, 1), we are at dim.
+    // at (2, 2), we are at 1/4
+    // at (4, 2), we are at 1/8
+
+    std::unique_ptr<std::vector<float>> impact(new std::vector<float>(dim*dim));
+
+    for (size_t y = 0; y < dim; y++) {
+        for (size_t x = 0; x < dim; x++) {
+            float val = calcFrac(x) * calcFrac(y);
+            (*impact)[y*dim + x] = val;
+        }
+    }
+    
+    return impact;
+
+}
+
+typedef std::pair<float, int> IndexedValue;
 long threshold3(std::vector<short>& s, int maxNum) {
 
     size_t channels = s[0];
-    size_t dim = s[1];    
+    size_t dim = s[1];
     
-    // build the impact map of each coeff -- the sum of the
-    // absolute values of the filter / bases
-    std::vector<long> impact(dim*dim);
-
-    for (size_t i = 0; i < dim*dim; i++) {
-        std::vector<short> buf(dim*dim);
-        buf[i] = 256;
-        ihaarTransform2DFlat(buf, dim);
-
-        long accum = 0;
-        for (short s : buf) {
-            accum += abs(s);
-        }
-
-        impact[i] = accum;
-    }
-
+    std::unique_ptr<std::vector<float>> pImpact = calculateImpact(dim);
+    std::vector<float> impact = *pImpact;
+    
+ 
     
     // build a priority queue of the maxNum smallest impact
     // elements that can be zeroed.
@@ -261,7 +292,7 @@ long threshold3(std::vector<short>& s, int maxNum) {
     for (size_t channel = 0; channel < channels; channel++) {
         for (size_t idx = 0; idx < dim*dim; idx++) {
             int gIdx = channel * (dim*dim) + idx + 2;
-            long val = s[gIdx];
+            float val = s[gIdx];
             val *= impact[idx];
             
             pq.push(IndexedValue(val, gIdx));
