@@ -281,7 +281,7 @@ long threshold3(std::vector<short>& s, int maxNum) {
     // build a priority queue of the maxNum smallest impact
     // elements that can be zeroed.
     auto cmp = [](IndexedValue left, IndexedValue right) {
-        return right.first - left.first;
+        return fabs(left.first) < fabs(right.first);
     };
     
     std::priority_queue<IndexedValue,
@@ -292,8 +292,14 @@ long threshold3(std::vector<short>& s, int maxNum) {
     for (size_t channel = 0; channel < channels; channel++) {
         for (size_t idx = 0; idx < dim*dim; idx++) {
             int gIdx = channel * (dim*dim) + idx + 2;
+
+            if (s[gIdx] == 0)
+                continue;
+            
             float val = s[gIdx];
             val *= impact[idx];
+
+
             
             pq.push(IndexedValue(val, gIdx));
 
@@ -307,7 +313,8 @@ long threshold3(std::vector<short>& s, int maxNum) {
     while (!pq.empty()) {
         IndexedValue iv = pq.top();
         pq.pop();
-        accum += s[iv.second];
+        printf("%f @ %d popped\n", fabs(iv.first), iv.second);
+        accum += abs(s[iv.second]);
         s[iv.second] = 0;
     }
 
