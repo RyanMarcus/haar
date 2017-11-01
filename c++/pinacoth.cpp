@@ -3,8 +3,11 @@
 #include "startstepstop.h"
 #include "compress_utils.h"
 
-std::unique_ptr<std::vector<unsigned char>> Image::compressImage(Image& i) {
+std::unique_ptr<std::vector<unsigned char>>
+Image::compressImage(Image& i, int energy) {
+    
     auto haarEncoded = encodeImage(i.numChannels, i.dimension, *i.data);
+    threshold3(*haarEncoded, energy);
     auto sssEncoded = encode(*haarEncoded);
     auto compressed = compressVec(*sssEncoded);
 

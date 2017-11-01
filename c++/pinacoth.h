@@ -12,7 +12,8 @@ public:
         data(std::move(data)) { }
 
     static std::unique_ptr<std::vector<unsigned char>> compressImage(
-        Image& img);
+        Image& img,
+        int energy);
     
     static std::unique_ptr<Image> uncompressImage(
         std::unique_ptr<std::vector<unsigned char>>);
