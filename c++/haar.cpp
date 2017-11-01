@@ -22,6 +22,7 @@
 #include "haar.h"
 #include "startstepstop.h"
 #include "compress_utils.h"
+#include "zorder.h"
 #include "util.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -337,6 +338,7 @@ long threshold2(std::vector<short>& s, int maxNum) {
     // |        1
     // |    86420
     long toR = 0;
+    long numRemoved = 0;
     for (size_t diagPoint = dim-1; diagPoint != 0; diagPoint--) {
         for (size_t rowColIdx = 0; rowColIdx < diagPoint*2; rowColIdx++) {
             short idx = rowColIdx / 2;
@@ -361,8 +363,9 @@ long threshold2(std::vector<short>& s, int maxNum) {
 
                 if (s[gIdx] != 0) {
                     toR += abs(s[gIdx]);
+                    numRemoved++;
                     s[gIdx] = 0;
-                    if (toR >= maxNum)
+                    if (numRemoved >= maxNum)
                         return toR;
                 }
                 
@@ -430,11 +433,12 @@ std::unique_ptr<std::vector<short>> encodeImage(
 
     toR->push_back((short)numChannels);
     toR->push_back((short)dim);
-    for (auto channel : channels)
-        for (auto row : channel)
-            for (auto val : row) {
-                toR->push_back(val);
-            }
+
+    for (auto& channel : channels) {
+        auto tmp = encodeSFC(channel, dim/2);
+        for (auto& val : *tmp)
+            toR->push_back(val);
+    }
 
     return toR;
 }
@@ -452,28 +456,31 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(
 
     int numChannels = enc[0];
     int dim = enc[1];
+
+    std::vector<std::unique_ptr<std::vector<std::vector<short>>>> channels2D;
+    {
+        std::vector<std::vector<short>> channels(numChannels);
     
-    std::vector<std::vector<std::vector<short>>> channels(numChannels);
-    
-    for (int c = 0; c < numChannels; c++) {
-        std::vector<std::vector<short>> channel(
-            dim, // number of entries
-            std::vector<short>(dim) // default entry
-            );
+        for (int c = 0; c < numChannels; c++) {
+            std::vector<short> channel(dim*dim, 0);
         
-        for (int j = 0; j < dim*dim; j++) {
-            int idx = j + (c*dim*dim) + 2;
-            
-            int row = j / dim;
-            int col = j % dim;
-
-            channel[row][col] = enc[idx];
+            for (int j = 0; j < dim*dim; j++) {
+                channel[j] = enc[c * dim*dim + j + 2];
+            }
+            channels[c] = channel;
         }
-        channels[c] = channel;
-    }
 
-    for (auto& channel : channels)
-        ihaarTransform2D(channel);
+
+    
+        for (unsigned int i = 0; i < channels.size(); i++) {
+            std::unique_ptr<std::vector<std::vector<short>>> decoded
+                = decodeSFC(channels[i], dim, dim/2);
+            channels2D.push_back(std::move(decoded));
+        }
+    }
+    
+    for (auto& channel : channels2D)
+        ihaarTransform2D(*channel);
 
     // recombine the channels into image data
     std::unique_ptr<std::vector<unsigned char>> toR(new std::vector<unsigned char>);
@@ -481,7 +488,7 @@ std::unique_ptr<std::vector<unsigned char>> decodeImage(
         int row = i / dim;
         int col = i % dim;
         for (int c = 0; c < numChannels; c++) {
-            short value = channels[c][row][col];
+            short value = (*channels2D[c])[row][col];
             // clamp the values
             if (value > 255)
                 value = 255;

@@ -2,14 +2,14 @@ CC=g++
 CFLAGS=-Wall -Wpedantic -std=c++11 -g -O3 
 JS_OUT=.
 
-O_FILES=haar.o startstepstop.o compress_utils.o pinacoth.o libz.a
-O_TEST_FILES=lodepng.o img_test.o sss_test.o compress_test.o pinacoth_test.o
+O_FILES=haar.o zorder.o startstepstop.o compress_utils.o pinacoth.o libz.a
+O_TEST_FILES=lodepng.o img_test.o sss_test.o compress_test.o pinacoth_test.o zorder_test.o
 
 # -s DEMANGLE_SUPPORT=1
 
 
-haar.js: haar.cpp util.cpp startstepstop.cpp zlibjs.a
-	em++ $(CFLAGS) --bind -DJAVASCRIPT -s TOTAL_MEMORY=536870912 --memory-init-file 0 --pre-js front.js compress_utils.cpp haar.cpp util.cpp startstepstop.cpp zlibjs.a -o $(JS_OUT)/haar.js
+haar.js: haar.cpp util.cpp startstepstop.cpp zorder.cpp zlibjs.a
+	em++ $(CFLAGS) --bind -DJAVASCRIPT -s TOTAL_MEMORY=536870912 --memory-init-file 0 --pre-js front.js compress_utils.cpp haar.cpp util.cpp startstepstop.cpp zorder.cpp zlibjs.a -o $(JS_OUT)/haar.js
 
 test_haar: $(O_FILES) $(O_TEST_FILES)
 	$(CC) $(CFLAGS) $(O_FILES) $(O_TEST_FILES) -o test_haar
@@ -24,7 +24,7 @@ lodepng.o: lodepng/
 	$(CC) $(CFLAGS) -c $< -o $@
 
 libz.a:
-	cd zlib && ./configure --static && make
+	cd zlib && ./configure --static && make CC=gcc
 	mv zlib/libz.a .
 
 zlibjs.a: 
